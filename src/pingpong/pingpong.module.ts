@@ -4,6 +4,6 @@ import { PingpongService } from './pingpong.service';
 
 @Module({
   controllers: [PingpongController],
-  providers: [PingpongService]
+  providers: [PingpongService],
 })
 export class PingpongModule {}
