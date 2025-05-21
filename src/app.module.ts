@@ -9,6 +9,7 @@ import * as Joi from 'joi';
       isGlobal: true,
       validationSchema: Joi.object({
         PONG: Joi.string().required(),
+        PORT: Joi.number().required(),
       }),
     }),
     PingpongModule,
