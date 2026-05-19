@@ -14,6 +14,12 @@ async function bootstrap() {
     .setTitle('The base nestjs api')
     .setDescription('The base nestjs api description')
     .setVersion('1.0')
+    .addSecurity('token', {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      description: 'Enter JWT token',
+    })
     .build();
   const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

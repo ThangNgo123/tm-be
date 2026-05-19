@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { PingpongModule } from './pingpong/pingpong.module';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { ProjectModule } from './project/project.module';
+import { TaskModule } from './task/task.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -11,10 +15,19 @@ import * as Joi from 'joi';
       validationSchema: Joi.object({
         PONG: Joi.string().required(),
         PORT: Joi.number().required(),
+        DATABASE_HOST: Joi.string().required(),
+        DATABASE_PORT: Joi.number().required(),
+        DATABASE_USER: Joi.string().required(),
+        DATABASE_PASSWORD: Joi.string().required(),
+        DATABASE_NAME: Joi.string().required(),
       }),
     }),
-    PingpongModule,
     DatabaseModule,
+    PingpongModule,
+    AuthModule,
+    UserModule,
+    ProjectModule,
+    TaskModule,
   ],
 })
 export class AppModule {}
