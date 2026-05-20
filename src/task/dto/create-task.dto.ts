@@ -26,7 +26,11 @@ export class CreateTaskDto {
 
   @IsDateString()
   @IsOptional()
-  due_date?: Date;
+  due_date_start?: string;
+
+  @IsDateString()
+  @IsOptional()
+  due_date_end?: string;
 
   @IsUUID()
   project_id: string;

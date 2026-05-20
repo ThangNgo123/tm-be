@@ -28,12 +28,26 @@ export class TaskService {
       throw new BadRequestException('Project not found or unauthorized');
     }
 
+    const dueDateStart = createTaskDto.due_date_start
+      ? new Date(createTaskDto.due_date_start)
+      : undefined;
+    const dueDateEnd = createTaskDto.due_date_end
+      ? new Date(createTaskDto.due_date_end)
+      : undefined;
+
+    if (dueDateStart && dueDateEnd && dueDateEnd < dueDateStart) {
+      throw new BadRequestException(
+        'due_date_end must be greater than or equal to due_date_start',
+      );
+    }
+
     const task = this.taskRepository.create({
       title: createTaskDto.title,
       description: createTaskDto.description,
       status: createTaskDto.status,
       priority: createTaskDto.priority,
-      due_date: createTaskDto.due_date,
+      due_date_start: dueDateStart,
+      due_date_end: dueDateEnd,
       project,
     });
 
@@ -74,7 +88,32 @@ export class TaskService {
   ): Promise<Task> {
     const task = await this.findOne(id, userId);
 
+    const hasDueDateStart = updateTaskDto.due_date_start !== undefined;
+    const hasDueDateEnd = updateTaskDto.due_date_end !== undefined;
+
+    const dueDateStart = hasDueDateStart
+      ? new Date(updateTaskDto.due_date_start as string)
+      : task.due_date_start;
+    const dueDateEnd = hasDueDateEnd
+      ? new Date(updateTaskDto.due_date_end as string)
+      : task.due_date_end;
+
+    if (dueDateStart && dueDateEnd && dueDateEnd < dueDateStart) {
+      throw new BadRequestException(
+        'due_date_end must be greater than or equal to due_date_start',
+      );
+    }
+
     Object.assign(task, updateTaskDto);
+
+    if (hasDueDateStart) {
+      task.due_date_start = dueDateStart;
+    }
+
+    if (hasDueDateEnd) {
+      task.due_date_end = dueDateEnd;
+    }
+
     return this.taskRepository.save(task);
   }
 

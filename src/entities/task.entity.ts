@@ -32,7 +32,10 @@ export class Task {
   priority?: number;
 
   @Column({ type: 'timestamp', nullable: true })
-  due_date?: Date;
+  due_date_start?: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  due_date_end?: Date;
 
   @ManyToOne(() => Project, (project) => project.tasks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'project_id' })
