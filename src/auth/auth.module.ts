@@ -8,11 +8,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthGuard } from './guards/jwt.guard';
 import { RefreshToken } from '../entities/refresh-token.entity';
 import { User } from '../entities/user.entity';
+import { Project } from '../entities/project.entity';
 import { UserService } from '../user/user.service';
+import { ProjectService } from '../project/project.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([RefreshToken, User]),
+    TypeOrmModule.forFeature([RefreshToken, User, Project]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService): JwtModuleOptions => ({
@@ -23,7 +25,7 @@ import { UserService } from '../user/user.service';
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy, AuthGuard, UserService],
+  providers: [AuthService, JwtStrategy, AuthGuard, UserService, ProjectService],
   controllers: [AuthController],
   exports: [AuthService, AuthGuard, JwtModule],
 })

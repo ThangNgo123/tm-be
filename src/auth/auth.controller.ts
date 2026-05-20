@@ -31,8 +31,6 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(AuthGuard)
-  @ApiSecurity('token')
   @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBody({
     schema: {

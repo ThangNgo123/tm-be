@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
 import { UserService } from '../user/user.service';
+import { ProjectService } from '../project/project.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -16,6 +17,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private userService: UserService,
+    private projectService: ProjectService,
     @InjectRepository(RefreshToken)
     private refreshTokenRepository: Repository<RefreshToken>,
   ) {
@@ -41,6 +43,7 @@ export class AuthService {
 
       // Check if user exists
       let user = await this.userService.findByEmail(payload.email);
+      let isNewUser = false;
 
       // Create user if doesn't exist
       if (!user) {
@@ -48,6 +51,13 @@ export class AuthService {
           email: payload.email,
           full_name: payload.name,
           avatar_url: payload.picture,
+        });
+        isNewUser = true;
+
+        // Create default project for new user
+        await this.projectService.create(user, {
+          name: 'default',
+          description: 'Default project',
         });
       }
 
@@ -58,7 +68,8 @@ export class AuthService {
           email: user.email,
         },
         {
-          expiresIn: (this.configService.get<string>('JWT_EXPIRATION') || '15m') as any,
+          expiresIn: (this.configService.get<string>('JWT_EXPIRATION') ||
+            '15m') as any,
         },
       );
 
@@ -108,7 +119,8 @@ export class AuthService {
           email: token.user.email,
         },
         {
-          expiresIn: (this.configService.get<string>('JWT_EXPIRATION') || '15m') as any,
+          expiresIn: (this.configService.get<string>('JWT_EXPIRATION') ||
+            '15m') as any,
         },
       );
 

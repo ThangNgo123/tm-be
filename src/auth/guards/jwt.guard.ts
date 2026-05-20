@@ -2,11 +2,10 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  UnauthorizedException,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-import { errorUserAuthen } from '../../utils/errorResponses';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -17,7 +16,7 @@ export class AuthGuard implements CanActivate {
 
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new HttpException(errorUserAuthen.tokenNotFound, 200);
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
     try {
@@ -25,7 +24,7 @@ export class AuthGuard implements CanActivate {
       request.user = verifyResult.user;
       return true;
     } catch (error) {
-      throw new HttpException(errorUserAuthen.invalidToken, 200);
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
   }
 
