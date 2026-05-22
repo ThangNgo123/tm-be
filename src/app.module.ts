@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PingpongModule } from './pingpong/pingpong.module';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
@@ -13,7 +12,6 @@ import * as Joi from 'joi';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        PONG: Joi.string().required(),
         PORT: Joi.number().required(),
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.number().required(),
@@ -23,7 +21,6 @@ import * as Joi from 'joi';
       }),
     }),
     DatabaseModule,
-    PingpongModule,
     AuthModule,
     UserModule,
     ProjectModule,
