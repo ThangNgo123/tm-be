@@ -31,10 +31,15 @@ jobs:
         run: |
           git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/ThangNgo123/tm-infra.git
 
-      - name: Update image tag
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
+      - name: Update backend image tag
         run: |
           cd tm-infra
-          sed -i "s/tag:.*/tag: ${GITHUB_SHA}/" values.yaml
+          yq -i '.be.image.tag = env(GITHUB_SHA)' values.yaml
 
       - name: Commit and push
         run: |
