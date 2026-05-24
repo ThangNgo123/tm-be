@@ -26,3 +26,24 @@ jobs:
       - name: Push image
         run: |
           docker push wincorn/tm-be:${{ github.sha }}
+
+      - name: Clone infra repo
+        run: |
+          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/wincorn/tm-infra.git
+
+      - name: Update image tag
+        run: |
+          cd tm-infra
+          sed -i "s/tag:.*/tag: ${GITHUB_SHA}/" values.yaml
+
+      - name: Commit and push
+        run: |
+          cd tm-infra
+
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          git add .
+          git commit -m "update backend image"
+
+          git push
