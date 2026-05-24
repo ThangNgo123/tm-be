@@ -26,29 +26,3 @@ jobs:
       - name: Push image
         run: |
           docker push wincorn/tm-be:${{ github.sha }}
-
-      - name: Clone infra repo
-        run: |
-          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/ThangNgo123/tm-infra.git
-
-      - name: Install yq
-        run: |
-          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-          sudo chmod +x /usr/bin/yq
-
-      - name: Update backend image tag
-        run: |
-          cd tm-infra
-          yq -i '.be.image.tag = env(GITHUB_SHA)' values.yaml
-
-      - name: Commit and push
-        run: |
-          cd tm-infra
-
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-
-          git add .
-          git commit -m "update backend image"
-
-          git push
