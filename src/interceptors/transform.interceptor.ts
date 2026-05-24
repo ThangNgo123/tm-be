@@ -21,7 +21,15 @@ export class TransformInterceptor<T>
     next: CallHandler<T>,
   ): Observable<IResponse<T>> {
     const ctx = context.switchToHttp();
+    const req = ctx.getRequest();
     const res = ctx.getResponse();
+
+    const requestPath = (req?.originalUrl || req?.url || '').split('?')[0];
+    const isMetricsEndpoint = /(^|\/)metrics$/.test(requestPath);
+
+    if (isMetricsEndpoint) {
+      return next.handle() as Observable<IResponse<T>>;
+    }
 
     return next.handle().pipe(
       map((result: any) => {
