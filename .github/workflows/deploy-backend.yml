@@ -29,7 +29,7 @@ jobs:
 
       - name: Clone infra repo
         run: |
-          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/wincorn/tm-infra.git
+          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/ThangNgo123/tm-infra.git
 
       - name: Update image tag
         run: |
