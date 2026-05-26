@@ -45,7 +45,7 @@ export class UserController {
   @Get()
   @UseGuards(AuthGuard)
   @ApiSecurity('token')
-  @ApiOperation({ summary: 'Get all users' })
+  @ApiOperation({ summary: 'Get all user' })
   findAll() {
     return this.userService.findAll();
   }
