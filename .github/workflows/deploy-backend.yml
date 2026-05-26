@@ -3,6 +3,7 @@ name: Deploy Backend
 on:
   push:
     branches:
+      - dev
       - main
 
 jobs:
@@ -13,6 +14,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set environment
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "ENV=prod" >> $GITHUB_ENV
+            echo "VALUES_PATH=apps/tm-app/environments/prod/values.yaml" >> $GITHUB_ENV
+          else
+            echo "ENV=dev" >> $GITHUB_ENV
+            echo "VALUES_PATH=apps/tm-app/environments/dev/values.yaml" >> $GITHUB_ENV
+          fi
+
+      - name: Set image tag
+        run: |
+          echo "IMAGE_TAG=${ENV}-${GITHUB_SHA}" >> $GITHUB_ENV
+
       - name: Login DockerHub
         uses: docker/login-action@v3
         with:
@@ -21,11 +36,11 @@ jobs:
 
       - name: Build image
         run: |
-          docker build -t wincorn/tm-be:${{ github.sha }} .
+          docker build -t wincorn/tm-be:${IMAGE_TAG} .
 
       - name: Push image
         run: |
-          docker push wincorn/tm-be:${{ github.sha }}
+          docker push wincorn/tm-be:${IMAGE_TAG}
 
       - name: Clone infra repo
         run: |
@@ -39,7 +54,10 @@ jobs:
       - name: Update backend image tag
         run: |
           cd tm-infra
-          yq -i '.be.image.tag = env(GITHUB_SHA)' values.yaml
+
+          yq -i '
+            .be.image.tag = env(IMAGE_TAG)
+          ' ${VALUES_PATH}
 
       - name: Commit and push
         run: |
@@ -49,6 +67,7 @@ jobs:
           git config user.email github-actions@github.com
 
           git add .
-          git commit -m "update backend image"
+
+          git commit -m "update backend image to ${IMAGE_TAG}" || echo "no changes"
 
           git push
