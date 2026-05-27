@@ -1,17 +1,16 @@
-FROM node:22-alpine AS base
+FROM node:22-alpine AS build
+
 WORKDIR /app
 
-FROM base AS deps
 COPY package*.json ./
 RUN npm ci
 
-FROM deps AS build
 COPY . .
+
 RUN npm run build
 
 FROM node:22-alpine AS production
 WORKDIR /app
-ENV NODE_ENV=production
 ENV PORT=3000
 
 COPY package*.json ./
