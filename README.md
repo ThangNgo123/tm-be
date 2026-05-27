@@ -44,6 +44,13 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+Swagger is enabled only when `NODE_ENV` is not `prod` or `production`. In development, protect the Swagger UI with Basic Auth by setting:
+
+```bash
+SWAGGER_BASIC_AUTH_USERNAME=your-user
+SWAGGER_BASIC_AUTH_PASSWORD=your-password
+```
+
 ## Run tests
 
 ```bash
