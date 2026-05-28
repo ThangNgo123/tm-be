@@ -30,37 +30,50 @@ async function bootstrap() {
       );
     }
 
-    app.use(
-      ['/api', '/api-json', '/api-yaml'],
-      (req: Request, res: Response, next: NextFunction) => {
-        const authHeader = req.headers.authorization;
+    const swaggerPaths = ['/api'];
 
-        if (!authHeader?.startsWith('Basic ')) {
-          res.setHeader('WWW-Authenticate', 'Basic realm="Swagger"');
-          return res.status(401).send('Unauthorized');
-        }
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      const requestPath = req.originalUrl.split('?')[0];
 
-        const credentials = Buffer.from(authHeader.slice(6), 'base64').toString(
-          'utf8',
-        );
-        const separatorIndex = credentials.indexOf(':');
-
-        if (separatorIndex === -1) {
-          res.setHeader('WWW-Authenticate', 'Basic realm="Swagger"');
-          return res.status(401).send('Unauthorized');
-        }
-
-        const username = credentials.slice(0, separatorIndex);
-        const password = credentials.slice(separatorIndex + 1);
-
-        if (username !== swaggerUsername || password !== swaggerPassword) {
-          res.setHeader('WWW-Authenticate', 'Basic realm="Swagger"');
-          return res.status(401).send('Unauthorized');
-        }
-
+      if (requestPath.startsWith('/api/v1')) {
         return next();
-      },
-    );
+      }
+
+      const isSwaggerRequest = swaggerPaths.some(
+        (path) => requestPath === path || requestPath.startsWith(`${path}/`),
+      );
+
+      if (!isSwaggerRequest) {
+        return next();
+      }
+
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader?.startsWith('Basic ')) {
+        res.setHeader('WWW-Authenticate', 'Basic realm="Swagger"');
+        return res.status(401).send('Unauthorized');
+      }
+
+      const credentials = Buffer.from(authHeader.slice(6), 'base64').toString(
+        'utf8',
+      );
+      const separatorIndex = credentials.indexOf(':');
+
+      if (separatorIndex === -1) {
+        res.setHeader('WWW-Authenticate', 'Basic realm="Swagger"');
+        return res.status(401).send('Unauthorized');
+      }
+
+      const username = credentials.slice(0, separatorIndex);
+      const password = credentials.slice(separatorIndex + 1);
+
+      if (username !== swaggerUsername || password !== swaggerPassword) {
+        res.setHeader('WWW-Authenticate', 'Basic realm="Swagger"');
+        return res.status(401).send('Unauthorized');
+      }
+
+      return next();
+    });
 
     const config = new DocumentBuilder()
       .setTitle('The tm project nestjs api')
